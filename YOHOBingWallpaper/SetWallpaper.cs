@@ -7,7 +7,10 @@ namespace YOHOBingWallpaper
 {
     class SetWallpaper
     {
-        //Code from https://github.com/atskyline/BingWallpaper Wallpaper.cs
+        /*
+        * Thanks to Neil N. for the wallpaper code:
+        * http://stackoverflow.com/a/1061682/4322228
+        */
         public enum Style
         {
             Tiled,
