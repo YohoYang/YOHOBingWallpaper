@@ -10,12 +10,12 @@ namespace YOHOBingWallpaper
         {
             if (GetFileExist())//如果文件存在
             {
-                if (GetTodayFileDate().Equals(GetDate(0)))//判断today.jpg修改时间是不是等于今天
+                if (GetTodayFileDate().Equals(GetDate(0)))//判断today.bmp修改时间是不是等于今天
                 {
                     SetWallpaper.SetWallpaperWrok(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Pictures\\YOHOBingWallpaper" + "\\today.bmp", SetWallpaper.Style.Stretched);
                     NoUpdate = false;
                 }
-                else if (GetTodayFileDate().Equals(GetDate(-1)))//判断today.jpg修改时间是不是等于昨天
+                else if (GetTodayFileDate().Equals(GetDate(-1)))//判断today.bmp修改时间是不是等于昨天
                 {
                     SetWallpaper.SetWallpaperWrok(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Pictures\\YOHOBingWallpaper" + "\\tomorrow.bmp", SetWallpaper.Style.Stretched);
                     NoUpdate = true;
@@ -38,7 +38,7 @@ namespace YOHOBingWallpaper
         {
             NoUpdate = ASwitch;
         }
-        private static String GetTodayFileDate()//获得today.jpg的日期
+        private static String GetTodayFileDate()//获得today.bmp的日期
         {
             System.IO.FileInfo fileinfo = new System.IO.FileInfo(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Pictures\\YOHOBingWallpaper" + "\\today.bmp");
             String filedate = fileinfo.LastWriteTime.ToString();

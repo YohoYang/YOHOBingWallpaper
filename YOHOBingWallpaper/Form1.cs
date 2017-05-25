@@ -106,8 +106,8 @@ namespace YOHOBingWallpaper
             notify.Visible = true;
             notify.BalloonTipText = GetBingWallpaper.ReturnCopyright() + " \n" + DateTime.Now.AddDays(0).ToShortDateString();
             notify.BalloonTipTitle = "YohoBingWallpaper";
-            notify.ShowBalloonTip(4000);
-            System.Threading.Thread.Sleep(4000);
+            notify.ShowBalloonTip(10000);
+            System.Threading.Thread.Sleep(5000);
             notify.Visible = false;
         }
     }
