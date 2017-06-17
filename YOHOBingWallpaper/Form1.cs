@@ -28,16 +28,17 @@ namespace YOHOBingWallpaper
                 if (!GetBingWallpaper.ReturnNetError())
                 {
                     GoToWorker();
+                    GoToGetWallpaper();
                     if (Worker.RetuenNoUpdate())
                     {
-                        GoToGetWallpaper();
                         GoToWorker();
-                        ShowBalloonTip();
+                        ShowBalloonTip(0);
                     }
                 }
                 else
                 {
                     GoToWorker();
+                    Worker.SetNoUpdate(true);
                 }
                 FirstTimeFinish = true;
             }
@@ -49,12 +50,7 @@ namespace YOHOBingWallpaper
                 if (isANewDay)//如果到新一天0点
                 {
                     GoToWorker();
-                    if (!GetBingWallpaper.ReturnNetError())
-                    {
-                        GoToGetWallpaper();
-                        ShowBalloonTip();
-                        Worker.SetNoUpdate(false);
-                    }
+                    ShowBalloonTip(-1);
                 }
                 else//其他情况
                 {
@@ -63,7 +59,6 @@ namespace YOHOBingWallpaper
                         if (!GetBingWallpaper.ReturnNetError())//如果网络正常
                         {
                             GoToGetWallpaper();
-                            ShowBalloonTip();
                             GoToWorker();
                         }
                     }
@@ -87,8 +82,10 @@ namespace YOHOBingWallpaper
             rk2.SetValue("YOHOBingWallpaper", path);
             rk2.Close();
             rk.Close();
+            rk.Dispose();
+            rk2.Dispose();
         }
-        public static void UnSetAutoStartup()//添加到注册表开机自动启动,取最后一次执行程序的位置
+        public static void UnSetAutoStartup()//取消注册表开机自动启动
         {
             RegistryKey rk = Registry.CurrentUser;
             RegistryKey rk2 = rk.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run");
@@ -96,20 +93,25 @@ namespace YOHOBingWallpaper
             rk2.DeleteValue("YOHOBingWallpaper");
             rk2.Close();
             rk.Close();
+            rk.Dispose();
+            rk2.Dispose();
         }
-        private void ShowBalloonTip()
+        private static void ShowBalloonTip(int Time)
         {
-            NotifyIcon notify = new NotifyIcon();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            notify.Text = "YOHOBingWallpaper";
-            notify.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            notify.Visible = true;
-            notify.BalloonTipText = GetBingWallpaper.ReturnCopyright() + " \n" + DateTime.Now.AddDays(0).ToShortDateString();
-            notify.BalloonTipTitle = "YohoBingWallpaper";
-            notify.ShowBalloonTip(10000);
-            System.Threading.Thread.Sleep(5000);
-            notify.Visible = false;
+            if (!GetBingWallpaper.todayCopyright.Equals("NetworkERROR"))
+            {
+                NotifyIcon notify = new NotifyIcon();
+                System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+                notify.Text = "YOHOBingWallpaper";
+                notify.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+                notify.Visible = true;
+                notify.BalloonTipText = GetBingWallpaper.ReturnCopyright(Time) + " \n" + DateTime.Now.AddDays(0).ToShortDateString();
+                notify.BalloonTipTitle = "YohoBingWallpaper";
+                notify.ShowBalloonTip(10000);
+                System.Threading.Thread.Sleep(5000);
+                notify.Visible = false;
+                notify.Dispose();
+            }
         }
     }
-
 }

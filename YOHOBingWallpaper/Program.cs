@@ -21,11 +21,10 @@ namespace YOHOBingWallpaper
                 {
                     // 启动程序
                     Application.Run(new Form1());
-
                 }
                 else
                 {
-                    DialogResult ask = MessageBox.Show("程序已经在后台运行\nYOHOBingWallpaper自动更换必应壁纸 版本:0.0.1.5\n作者网站www.yohoyang.com  图片保存在我的文档内的图片目录\n\n此界面可以完成卸载:需要为你关闭后台程序并取消开机自动启动吗\n\n选择[是]将关闭后台并取消自启\n选择[否]将什么都不做", "YOHOBingWallpaper", MessageBoxButtons.YesNo);
+                    DialogResult ask = MessageBox.Show("程序已经在后台运行\nYOHOBingWallpaper自动更换必应壁纸 版本:0.0.2.0\n作者网站www.yohoyang.com  图片保存在我的文档内的图片目录\n\n此界面可以完成卸载:需要为你关闭后台程序并取消开机自动启动吗\n\n选择[是]将关闭后台并取消自启\n选择[否]将什么都不做", "YOHOBingWallpaper", MessageBoxButtons.YesNo);
                     if (ask == DialogResult.Yes)
                     {
                         //调用删除注册表的方法

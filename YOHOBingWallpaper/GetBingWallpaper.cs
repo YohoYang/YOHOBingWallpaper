@@ -13,7 +13,8 @@ namespace YOHOBingWallpaper
         private String baseURL = "https://www.bing.com/HPImageArchive.aspx";
         private String fullURL;
         private String imageURL;
-        public static String todayCopyright;
+        public static String todayCopyright = "NetworkERROR";
+        public static String tomorrowCopyright = "NetworkERROR";
         public static bool Neterror = false;
         public void GetWallpaper()
         {
@@ -22,8 +23,8 @@ namespace YOHOBingWallpaper
             {
                 Directory.CreateDirectory(Picturespath);//创建一个路径的文件夹
             }
-            DownloadWallpaper(GetXML(-1), Picturespath + "\\tomorrow.jpg", "tomorrow.bmp");
             DownloadWallpaper(GetXML(0), Picturespath + "\\today.jpg", "today.bmp");
+            DownloadWallpaper(GetXML(-1), Picturespath + "\\tomorrow.jpg", "tomorrow.bmp");
         }
         private String GetXML(Int32 Time)
         {
@@ -45,7 +46,7 @@ namespace YOHOBingWallpaper
             doc.LoadXml(XML);
             var urlBaseNode = doc.SelectSingleNode("//urlBase");
             var copyrightNode = doc.SelectSingleNode("//copyright");
-            todayCopyright = copyrightNode.InnerText;
+            SaveCopyright(Time, copyrightNode.InnerText);//保存两天的CopyRight信息
             imageURL = "https://www.bing.com" + urlBaseNode.InnerText + "_" + SelectASize() + ".jpg";
             return imageURL;
         }
@@ -104,17 +105,26 @@ namespace YOHOBingWallpaper
             {
                 Neterror = true;
             }
+            ping.Dispose();
         }
         public static bool ReturnNetError()
         {
             PingBing();
             return Neterror;
         }
-        public static String ReturnCopyright()
+        public static String ReturnCopyright(int Time)
         {
-            return todayCopyright;
+            if (Time == 0)
+            {
+                return todayCopyright;
+            }
+            else
+            {
+                return tomorrowCopyright;
+            }
+
         }
-        public static void JPGtoBMP(String filename, String BmpFileName)
+        private static void JPGtoBMP(String filename, String BmpFileName)
         {
             if (File.Exists(filename))
             {
@@ -129,6 +139,17 @@ namespace YOHOBingWallpaper
             else
             {
                 Worker.SetNoUpdate(true);
+            }
+        }
+        private static void SaveCopyright(int Time, String CP)
+        {
+            if (Time == -1)
+            {
+                tomorrowCopyright = CP;
+            }
+            else
+            {
+                todayCopyright = CP;
             }
         }
     }
