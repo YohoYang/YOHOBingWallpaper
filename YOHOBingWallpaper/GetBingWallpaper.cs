@@ -16,15 +16,23 @@ namespace YOHOBingWallpaper
         public static String todayCopyright = "NetworkERROR";
         public static String tomorrowCopyright = "NetworkERROR";
         public static bool Neterror = false;
-        public void GetWallpaper()
+        public void GetWallpaper(bool onlyGetCopyRight)
         {
             string Picturespath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Pictures\\YOHOBingWallpaper";
             if (!Directory.Exists(Picturespath))//如果路径不存在
             {
                 Directory.CreateDirectory(Picturespath);//创建一个路径的文件夹
             }
-            DownloadWallpaper(GetXML(0), Picturespath + "\\today.jpg", "today.bmp");
-            DownloadWallpaper(GetXML(-1), Picturespath + "\\tomorrow.jpg", "tomorrow.bmp");
+            if (onlyGetCopyRight)
+            {
+                GetXML(0);
+                GetXML(-1);
+            }
+            else
+            {
+                DownloadWallpaper(GetXML(0), Picturespath + "\\today.jpg", "today.bmp");
+                DownloadWallpaper(GetXML(-1), Picturespath + "\\tomorrow.jpg", "tomorrow.bmp");
+            }
         }
         private String GetXML(Int32 Time)
         {
@@ -52,20 +60,7 @@ namespace YOHOBingWallpaper
         }
         private String SelectASize()
         {
-            Rectangle screen = Screen.PrimaryScreen.Bounds;
-            double ScreenResolution = (double)screen.Width / screen.Height;
-            if (ScreenResolution >= 0 && ScreenResolution < 1.4)
-            {
-                return "1024x768";
-            }
-            else if (ScreenResolution >= 1.4 && ScreenResolution < 1.7)
-            {
-                return "1920x1200";
-            }
-            else
-            {
-                return "1920x1080";
-            }
+            return "1920x1080";//去掉下载不同分辨率的功能,改为裁剪,因为1920*1200有水印,1920*1080是最大美观分辨率
         }
         private void DownloadWallpaper(String address, String filename, String BmpFileName)
         {
@@ -81,12 +76,12 @@ namespace YOHOBingWallpaper
                     throw;
                 }
             }
-            JPGtoBMP(filename, BmpFileName);
+            SavatoBMP(filename, BmpFileName);
         }
         //检测网络连接是否正常
         private static void PingBing()
         {
-            String BingURL = "www.bing.com";
+            String BingURL = "223.6.6.6";//使用阿里DNS的ip来检测,避免部分原域名解析导致的bug
             Ping ping = new Ping();
             try
             {
@@ -124,16 +119,52 @@ namespace YOHOBingWallpaper
             }
 
         }
-        private static void JPGtoBMP(String filename, String BmpFileName)
+        private static void SavatoBMP(String filename, String BmpFileName)//重写使支持不同分辨率裁剪为最佳分辨率后设置,避免画面拉伸和压缩
         {
             if (File.Exists(filename))
             {
-                FileStream stream;
-                stream = File.OpenRead(filename);
-                Bitmap jpg = new Bitmap(stream);
-                jpg.Save(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Pictures\\YOHOBingWallpaper\\" + BmpFileName, System.Drawing.Imaging.ImageFormat.Bmp);
-                stream.Dispose();
-                jpg.Dispose();
+                Rectangle screen = Screen.PrimaryScreen.Bounds;
+                double screenRate = (double)screen.Width / screen.Height;
+                double picRate = (double)1920 / 1080;
+                Rectangle fromR = new Rectangle(0, 0, 0, 0);
+                Rectangle toR = new Rectangle(0, 0, 0, 0);
+                Bitmap bitmap = new Bitmap(filename);
+                if (screenRate == picRate)
+                {
+                    bitmap.Save(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Pictures\\YOHOBingWallpaper\\" + BmpFileName, System.Drawing.Imaging.ImageFormat.Bmp);
+                }
+                else
+                {
+                    if (screenRate > picRate)
+                    {
+                        fromR.X = 0;
+                        fromR.Y = (1080 - (int)(1920 / screenRate)) / 2;
+                        fromR.Width = 1920;
+                        fromR.Height = (int)(1920 / screenRate);
+                        toR.X = 0;
+                        toR.Y = 0;
+                        toR.Width = 1920;
+                        toR.Height = (int)(1920 / screenRate);
+                    }
+                    else
+                    {
+                        fromR.X = (1920 - (int)(1080 * screenRate)) / 2;
+                        fromR.Y = 0;
+                        fromR.Width = (int)(1080 * screenRate);
+                        fromR.Height = 1080;
+                        toR.X = 0;
+                        toR.Y = 0;
+                        toR.Width = (int)(1080 * screenRate);
+                        toR.Height = 1080;
+                    }
+                    var bt = new Bitmap(toR.Width, toR.Height);
+                    var graphics = Graphics.FromImage(bt);
+                    graphics.DrawImage(bitmap, toR, fromR, GraphicsUnit.Pixel);
+                    bt.Save(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Pictures\\YOHOBingWallpaper\\" + BmpFileName, System.Drawing.Imaging.ImageFormat.Bmp);
+                    bt.Dispose();
+                    graphics.Dispose();
+                }
+                bitmap.Dispose();
                 File.Delete(filename);
             }
             else

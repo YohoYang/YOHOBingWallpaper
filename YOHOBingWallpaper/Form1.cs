@@ -28,11 +28,15 @@ namespace YOHOBingWallpaper
                 if (!GetBingWallpaper.ReturnNetError())
                 {
                     GoToWorker();
-                    GoToGetWallpaper();
                     if (Worker.RetuenNoUpdate())
                     {
+                        GoToGetWallpaper(false);
                         GoToWorker();
                         ShowBalloonTip(0);
+                    }
+                    else
+                    {
+                        GoToGetWallpaper(true);
                     }
                 }
                 else
@@ -46,7 +50,7 @@ namespace YOHOBingWallpaper
             {
                 int intHour = DateTime.Now.Hour;
                 int intMinute = DateTime.Now.Minute;
-                bool isANewDay = (intHour == 00 && intMinute == 00 && intSecond == 00);
+                bool isANewDay = (intHour == 00 && intMinute == 00);
                 if (isANewDay)//如果到新一天0点
                 {
                     GoToWorker();
@@ -58,17 +62,24 @@ namespace YOHOBingWallpaper
                     {
                         if (!GetBingWallpaper.ReturnNetError())//如果网络正常
                         {
-                            GoToGetWallpaper();
+                            GoToGetWallpaper(false);
                             GoToWorker();
+                        }
+                    }
+                    else if (GetBingWallpaper.todayCopyright.Equals("NetworkERROR"))
+                    {
+                        if (!GetBingWallpaper.ReturnNetError())//如果网络正常
+                        {
+                            GoToGetWallpaper(true);
                         }
                     }
                 }
             }
         }
-        private void GoToGetWallpaper()//跳转到GetBingWallpaper
+        private void GoToGetWallpaper(bool onlyGetCopyRight)//跳转到GetBingWallpaper
         {
             GetBingWallpaper get = new GetBingWallpaper();
-            get.GetWallpaper();
+            get.GetWallpaper(onlyGetCopyRight);
         }
         private void GoToWorker()//跳转到Worker
         {
