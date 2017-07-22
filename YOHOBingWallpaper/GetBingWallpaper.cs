@@ -81,24 +81,28 @@ namespace YOHOBingWallpaper
         //检测网络连接是否正常
         private static void PingBing()
         {
-            String BingURL = "223.6.6.6";//使用阿里DNS的ip来检测,避免部分原域名解析导致的bug
+            String[] PingURL = { "223.5.5.5", "8.8.8.8", "114.114.114.114" };//使用一组ip来提高判断网络连接的有效性的准确率v0.0.3.1
             Ping ping = new Ping();
-            try
+            for (int i = 0; i < PingURL.Length; i++)
             {
-                PingReply pr;
-                pr = ping.Send(BingURL);
-                if (pr.Status != IPStatus.Success)
+                try
+                {
+                    PingReply pr;
+                    pr = ping.Send(PingURL[i]);
+                    if (pr.Status != IPStatus.Success)
+                    {
+                        Neterror = true;
+                    }
+                    else
+                    {
+                        Neterror = false;
+                        break;
+                    }
+                }
+                catch
                 {
                     Neterror = true;
                 }
-                else
-                {
-                    Neterror = false;
-                }
-            }
-            catch
-            {
-                Neterror = true;
             }
             ping.Dispose();
         }
